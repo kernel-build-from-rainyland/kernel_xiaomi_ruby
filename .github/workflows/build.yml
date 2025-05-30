@@ -209,14 +209,23 @@ jobs:
         run: |
           echo "" > .scmversion
           curl -LSs "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh" | bash -s next
-          KERNELSU_NEXT_VERSION=$(cd KernelSU-Next && expr $(/usr/bin/git rev-list --count HEAD) + 10200)
+        
+          cd KernelSU-Next
+          # Checkout to commit #2162 for version 12362
+          COMMIT_HASH=$(git rev-list --reverse HEAD | sed -n '2162p')
+          git checkout $COMMIT_HASH
+        
+          # Confirm version for CI output
+          KERNELSU_NEXT_VERSION=$(expr $(git rev-list --count HEAD) + 10200)
           echo -e "\n💡 KernelSU Next version: $KERNELSU_NEXT_VERSION\n"
           echo -e "KERNELSU_NEXT_VERSION=$KERNELSU_NEXT_VERSION" >> $GITHUB_OUTPUT
-          cd KernelSU-Next
+        
+          # Apply susfs patch
           curl https://raw.githubusercontent.com/wodanesdag/susfs4ksu/refs/heads/next-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch -o susfs.patch
           patch -p1 < susfs.patch
           cd ../scripts
-          sed -i 's/ -dirty//g' setlocalversion    
+          sed -i 's/ -dirty//g' setlocalversion
+
 
       - name: "👍 Make defconfig"
         working-directory: ${{ env.KERNEL_NAME }}
