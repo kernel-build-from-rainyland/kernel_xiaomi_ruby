@@ -2,7 +2,7 @@
   {
     "kernelSource": {
       "name": "ruby",
-      "repo": "https://github.com/wodanesdag/android_kernel_xiaomi_mt6877",
+      "repo": "https://github.com/RainyXeon/android_kernel_xiaomi_mt6877",
       "branch": "dev",
       "device": "ruby",
       "defconfig": "ruby_defconfig"
@@ -22,8 +22,8 @@
       "ARCH": "arm64",
       "CC": "clang-crDroid/bin/clang",
       "externalCommand": {
-        "KBUILD_BUILD_HOST": "LEGION",
-        "KBUILD_BUILD_USER": "wodanesdag",
+        "KBUILD_BUILD_HOST": "pipewire",
+        "KBUILD_BUILD_USER": "rainyxeon",
         "CROSS_COMPILE": "clang-crDroid/bin/aarch64-linux-gnu-",
         "CROSS_COMPILE_ARM32": "clang-crDroid/bin/arm-linux-gnueabi-",
         "LD": "clang-crDroid/bin/ld.lld",
