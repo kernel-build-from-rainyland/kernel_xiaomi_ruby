@@ -22,7 +22,7 @@
       "ARCH": "arm64",
       "CC": "clang-crDroid/bin/clang",
       "externalCommand": {
-        "KBUILD_BUILD_HOST": "pipewire",
+        "KBUILD_BUILD_HOST": "perfc.com",
         "KBUILD_BUILD_USER": "rainyxeon",
         "CROSS_COMPILE": "clang-crDroid/bin/aarch64-linux-gnu-",
         "CROSS_COMPILE_ARM32": "clang-crDroid/bin/arm-linux-gnueabi-",
