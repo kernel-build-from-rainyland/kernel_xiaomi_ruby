@@ -4,9 +4,6 @@ env:
   OUT_DIR: "${{ github.workspace }}/out"
 
 on:
-  push:
-    branches:
-      - 'dev'
   workflow_dispatch:
 
 jobs:
