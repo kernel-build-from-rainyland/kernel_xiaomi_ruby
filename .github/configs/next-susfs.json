@@ -2,7 +2,7 @@
   {
     "kernelSource": {
       "name": "ruby",
-      "repo": "https://github.com/RainyXeon/PrivateKernel",
+      "repo": "https://github.com/RainyXeon/MoonWake",
       "branch": "dev",
       "device": "ruby",
       "defconfig": "ruby_defconfig"
