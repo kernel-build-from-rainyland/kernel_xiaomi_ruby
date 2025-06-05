@@ -7,8 +7,11 @@
       "device": "ruby",
       "defconfig": "ruby_defconfig"
     },
-    "withAPatch": true,
-    "APatchVersion": "0.11.1-dev",
+    "apatch": {
+      "enable": true,
+      "version": "0.11.1-dev",
+      "cherish": true
+    }
     "toolchains": [
       {
         "repo": "https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225",
@@ -40,12 +43,6 @@
         "LLVM_AR": "clang-crDroid/bin/llvm-ar",
         "LLVM_DIS": "clang-crDroid/bin/llvm-dis"
       }
-    },
-    "AnyKernel3": {
-      "use": true,
-      "release": true,
-      "repo": "https://github.com/wodanesdag/AnyKernel3/",
-      "branch": "ruby"
     }
   }
 ]
