@@ -221,7 +221,7 @@ jobs:
           arch: ${{ steps.generate-args.outputs.ARCH }}
           anykernel: "${{ env.WORKSPACE }}/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}"
         run: |
-          tree .
+          tree ../out
           cd ../AnyKernel3
           curl -L -O https://github.com/bmax121/KernelPatch/releases/download/${{ env.APatchVersion }}/kptools-linux
           curl -L -O https://github.com/bmax121/KernelPatch/releases/download/${{ env.APatchVersion }}/kpimg-android
