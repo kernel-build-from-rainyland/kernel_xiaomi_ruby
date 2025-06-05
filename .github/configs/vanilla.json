@@ -11,7 +11,7 @@
       "enable": false,
       "version": "0.11.1-dev",
       "cherish": false
-    }
+    },
     "toolchains": [
       {
         "repo": "https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225",
