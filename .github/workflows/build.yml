@@ -195,10 +195,7 @@ jobs:
           arch: ${{ steps.generate-args.outputs.ARCH }}
         run: |
           mkdir out_kernel
-          cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz-dtb ./out_kernel/
-          cd out_kernel
-          curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/ramdisk.img
-          cd ..
+          cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image ./out_kernel/
       - name: "Setup APatch tools"
         if: ${{ env.withAPatch == 'true' }}
         run: |
@@ -220,39 +217,46 @@ jobs:
         run: |
           if [ ${{ env.withCherish }} = true ]; then
             ./apt/kptools \
-              -p -i ./out_kernel/Image.gz-dtb \
+              -p -i ./out_kernel/Image \
               -s "${{ secrets.APATCH_KEY }}" \
               -M ./apt/crpkb.kpm -V pre-kernel-init -T kpm \
               -k ./apt/kpimg -o ./out_kernel/kernel
           else
             ./apt/kptools \
-              -p -i ./out_kernel/Image.gz-dtb \
+              -p -i ./out_kernel/Image \
               -s "${{ secrets.APATCH_KEY }}" \
               -k ./apt/kpimg -o ./out_kernel/kernel
           fi
       - name: "Pack kernel image"
         run: | 
-          git clone https://github.com/xiaolu/mkbootimg_tools
-          chmod +x ./mkbootimg_tools/mkbootimg
+          git clone https://github.com/alitekin2fx/magiskboot.git
+          
+          chmod +x ./magiskboot/magiskboot
+          
+          mkdir wrap_kernel
+          cd wrap_kernel
+          
+          curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/og-apatch.img
+          
+          ./magiskboot/magiskboot unpack og-apatch.img
+          rm -rf ./kernel
+
           if [ ${{ env.withAPatch }} = true ]; then
-            ./mkbootimg_tools/mkbootimg \
-              --kernel ./out_kernel/kernel \
-              --ramdisk ./out_kernel/ramdisk.img \
-              --output ./out_kernel/boot.img
+            mv ../out_kernel/kernel .
           else
-          ./mkbootimg_tools/mkbootimg \
-            --kernel ./out_kernel/Image.gz-dtb \
-            --ramdisk ./out_kernel/ramdisk.img \
-            --output ./out_kernel/boot.img
+            mv ../out_kernel/Image .
           fi
+          
+          ./magiskboot/magiskboot unpack og-apatch.img
+
           if [ ${{ env.withAPatch }} = true ]; then
             if [ ${{ env.withCherish }} = true ]; then
-              cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             else
-              cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             fi
           else
-            cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
+            cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
           fi
       - name: "Upload image (cherish apatch)"
         uses: actions/upload-artifact@v4
