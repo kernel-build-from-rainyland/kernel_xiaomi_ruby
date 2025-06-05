@@ -263,13 +263,13 @@ jobs:
           fi
       - name: "Upload image (cherish apatch)"
         uses: actions/upload-artifact@v4
-        if: ${{ env.withAPatch == "true" && env.withCherish == "true" }}
+        if: ${{ env.withAPatch == 'true' && env.withCherish == 'true'}}
         with:
           name: "${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
           path: "out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
       - name: "Upload image (apatch)"
         uses: actions/upload-artifact@v4
-        if: ${{ env.withAPatch == "true" && env.withCherish != "true" }}
+        if: ${{ env.withAPatch == 'true' && env.withCherish != 'true' }}
         with:
           name: "${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
           path: "out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
