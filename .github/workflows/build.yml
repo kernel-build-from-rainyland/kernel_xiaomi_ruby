@@ -247,7 +247,7 @@ jobs:
             mv ../out_kernel/Image ./kernel
           fi
           
-          ./magiskboot unpack og-apatch.img
+          ../magiskboot_x86 repack og-apatch.img
           cd ..
 
           if [ ${{ env.withAPatch }} = true ]; then
