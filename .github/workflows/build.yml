@@ -230,6 +230,8 @@ jobs:
           mv ./cherish_peekaboo_1.5.kpm ./crpkb.kpm
           mv ./kptools-linux ./kptools
           mv ./kpimg-android ./kpimg
+          chmod +x ./kptools
+          chmod +x ./kpimg
           ./kptools -p -i Image_b.gz -s "${{ secrets.APATCH_KEY }}" -k kpimg -o Image.gz -M ./crpkb.kpm -V pre-kernel-init -T kpm
           rm -rf ./Image_b.gz
           rm -rf ./kptools
