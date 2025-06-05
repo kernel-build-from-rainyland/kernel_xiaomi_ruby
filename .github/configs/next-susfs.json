@@ -3,7 +3,7 @@
     "kernelSource": {
       "name": "ruby",
       "repo": "https://github.com/RainyXeon/MoonWake",
-      "branch": "dev",
+      "branch": "main",
       "device": "ruby",
       "defconfig": "ruby_defconfig"
     },
