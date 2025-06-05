@@ -194,7 +194,7 @@ jobs:
         env:
           arch: ${{ steps.generate-args.outputs.ARCH }}
         run: |
-          mv -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz-dtb ./out_kernel/
+          cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz-dtb ./out_kernel/
           cd out_kernel
           curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/ramdisk.img
           cd ..
@@ -246,12 +246,12 @@ jobs:
           fi
           if [ ${{ env.withAPatch }} = true ]; then
             if [ ${{ env.withCherish }} = true ]; then
-              mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             else
-              mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             fi
           else
-            mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
+            cp -f ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
           fi
       - name: "Upload image (cherish apatch)"
         uses: actions/upload-artifact@v4
