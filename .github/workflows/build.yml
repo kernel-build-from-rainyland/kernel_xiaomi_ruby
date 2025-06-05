@@ -49,8 +49,9 @@ jobs:
 
       DEFCONFIG_NAME: ${{ matrix.repos.kernelSource.defconfig }}
 
-      withAPatch: ${{ matrix.repos.withAPatch }}
-      APatchVersion: ${{ matrix.repos.APatchVersion }}
+      withAPatch: ${{ matrix.repos.apatch.enable }}
+      APatchVersion: ${{ matrix.repos.apatch.version }}
+      withCherish: ${{ matrix.repos.apatch.cherish }}
       ccache: ${{ matrix.repos.ccache }}
       useAnykernel: ${{ matrix.repos.AnyKernel3.use }}
       release: ${{ matrix.repos.AnyKernel3.release }}
@@ -197,50 +198,84 @@ jobs:
         run: |
           echo "PATH Variable: $PATH"
           make ${{ env.args }}
-      - name: "Push to AnyKernel3 folder"
-        if: ${{ env.useAnykernel == 'true' }}
+      - name: "Push to out_kernel folder and download ramdisk"
         env:
           arch: ${{ steps.generate-args.outputs.ARCH }}
-          anykernel: "${{ env.WORKSPACE }}/${{ env.KERNEL_DEVICE }}-Next-SuSFS-${{ steps.integrate-kernelsu-next.outputs.KERNELSU_NEXT_VERSION }}-${{ env.builddate }}"
         run: |
-          ls -al
-          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz" ]; then
-            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz ./AnyKernel3/
-          fi
-          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo" ]; then
-            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo ./AnyKernel3/
-          fi
-          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo.img" ]; then
-            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo.img ./AnyKernel3/
-          fi
-      - name: "Patch kernel with APatch / Cherish Peekaboo"
-        working-directory: ${{ env.KERNEL_NAME }}
+          mv -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz-dtb ./out_kernel/
+          cd out_kernel
+          curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/ramdisk.img
+          cd ..
+      - name: "Setup APatch tools"
         if: ${{ env.withAPatch == 'true' }}
-
-        env:
-          arch: ${{ steps.generate-args.outputs.ARCH }}
-          anykernel: "${{ env.WORKSPACE }}/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}"
         run: |
-          tree ../out
-          cd ../AnyKernel3
+          mkdir apt
+          cd apt
           curl -L -O https://github.com/bmax121/KernelPatch/releases/download/${{ env.APatchVersion }}/kptools-linux
           curl -L -O https://github.com/bmax121/KernelPatch/releases/download/${{ env.APatchVersion }}/kpimg-android
-          curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/module/cherish_peekaboo_1.5.kpm
-          mv ./Image.gz ./Image_b.gz
-          mv ./cherish_peekaboo_1.5.kpm ./crpkb.kpm
           mv ./kptools-linux ./kptools
           mv ./kpimg-android ./kpimg
           chmod +x ./kptools
           chmod +x ./kpimg
-          ./kptools -p -i Image_b.gz -s "${{ secrets.APATCH_KEY }}" -k kpimg -o Image.gz -M ./crpkb.kpm -V pre-kernel-init -T kpm
-          rm -rf ./Image_b.gz
-          rm -rf ./kptools
-          rm -rf ./kpimg
-          rm -rf ./crpkb.kpm
-          zip -q -r "${{ env.anykernel }}.zip" *
-      - name: "Upload AnyKernel3 image => (${{ env.builddate }})"
+          if [ ${{ env.withCherish }} = true ]; then
+            curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/module/cherish_peekaboo_1.5.kpm
+            mv ./cherish_peekaboo_1.5.kpm ./crpkb.kpm
+          fi
+          cd ..
+      - name: "Patching kernel with apatch"
+        if: ${{ env.withAPatch == 'true' }}
+        run: |
+          if [ ${{ env.withCherish }} = true ]; then
+            ./apt/kptools \
+              -p -i ./out_kernel/Image.gz-dtb \
+              -s "${{ secrets.APATCH_KEY }}" \
+              -M ./apt/crpkb.kpm -V pre-kernel-init -T kpm \
+              -k ./apt/kpimg -o ./out_kernel/kernel
+          else
+            ./apt/kptools \
+              -p -i ./out_kernel/Image.gz-dtb \
+              -s "${{ secrets.APATCH_KEY }}" \
+              -k ./apt/kpimg -o ./out_kernel/kernel
+          fi
+      - name: "Pack kernel image"
+        run: | 
+          git clone https://github.com/xiaolu/mkbootimg_tools
+          chmod +x ./mkbootimg_tools/mkbootimg
+          if [ ${{ env.withAPatch }} = true ]; then
+            ./mkbootimg_tools/mkbootimg \
+              --kernel ./out_kernel/kernel \
+              --ramdisk ./out_kernel/ramdisk.img \
+              --output ./out_kernel/boot.img
+          else
+          ./mkbootimg_tools/mkbootimg \
+            --kernel ./out_kernel/Image.gz-dtb \
+            --ramdisk ./out_kernel/ramdisk.img \
+            --output ./out_kernel/boot.img
+          fi
+          if [ ${{ env.withAPatch }} = true ]; then
+            if [ ${{ env.withCherish }} = true ]; then
+              mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+            else
+              mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+            fi
+          else
+            mv ./out_kernel/boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
+          fi
+      - name: "Upload image (cherish apatch)"
         uses: actions/upload-artifact@v4
-        if: ${{ env.useAnykernel == 'true' }}
+        if: env.withAPatch == "true" && env.withCherish == "true"
         with:
-          name: "${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}"
-          path: AnyKernel3/*
+          name: "${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
+          path: "out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
+      - name: "Upload image (apatch)"
+        uses: actions/upload-artifact@v4
+        if: env.withAPatch == "true" && env.withCherish != "true"
+        with:
+          name: "${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
+          path: "out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
+      - name: "Upload image (vanilla)"
+        uses: actions/upload-artifact@v4
+        if: env.withAPatch != 'true' && env.withCherish != 'true'
+        with:
+          name: "${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}"
+          path: "out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img"
