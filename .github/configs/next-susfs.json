@@ -7,8 +7,7 @@
       "device": "ruby",
       "defconfig": "ruby_defconfig"
     },
-    "withKernelSU": false,
-    "withSuSFS": false,
+    "withAPatch": false,
     "toolchains": [
       {
         "repo": "https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225",
