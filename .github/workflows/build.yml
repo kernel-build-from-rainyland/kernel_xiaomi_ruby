@@ -229,34 +229,35 @@ jobs:
           fi
       - name: "Pack kernel image"
         run: | 
-          git clone https://github.com/alitekin2fx/magiskboot.git
+          curl -L -O https://github.com/Shubhamvis98/AIK/raw/4ac321dfd48e16344e6146c505708aa720ff0bb3/bin/magiskboot_x86
           
-          chmod +x ./magiskboot/magiskboot
+          chmod +x ./magiskboot_x86
           
           mkdir wrap_kernel
           cd wrap_kernel
           
           curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/og-apatch.img
           
-          ./magiskboot/magiskboot unpack og-apatch.img
+          ../magiskboot_x86 unpack og-apatch.img
           rm -rf ./kernel
 
           if [ ${{ env.withAPatch }} = true ]; then
-            mv ../out_kernel/kernel .
+            mv ../out_kernel/kernel ./kernel
           else
-            mv ../out_kernel/Image .
+            mv ../out_kernel/Image ./kernel
           fi
           
-          ./magiskboot/magiskboot unpack og-apatch.img
+          ./magiskboot unpack og-apatch.img
+          cd ..
 
           if [ ${{ env.withAPatch }} = true ]; then
             if [ ${{ env.withCherish }} = true ]; then
-              cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             else
-              cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
+              cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
             fi
           else
-            cp -f ./out_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
+            cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
           fi
       - name: "Upload image (cherish apatch)"
         uses: actions/upload-artifact@v4
