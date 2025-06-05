@@ -8,6 +8,7 @@
       "defconfig": "ruby_defconfig"
     },
     "withAPatch": true,
+    "APatchVersion": "0.11.1-dev",
     "toolchains": [
       {
         "repo": "https://gitlab.com/crdroidandroid/android_prebuilts_clang_host_linux-x86_clang-r536225",
