@@ -207,11 +207,10 @@ jobs:
           mv ./kpimg-android ./kpimg
           chmod +x ./kptools
           chmod +x ./kpimg
-          if [ ${{ env.withCherish }} = true ]; then
-            curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/module/cherish_peekaboo_1.5.kpm
-            mv ./cherish_peekaboo_1.5.kpm ./crpkb.kpm
-          fi
           cd ..
+      - name: "Setup cherish"
+        if: ${{ env.withCherish == 'true' }}
+        run: "curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/module/cherish_peekaboo_1.5.kpm"
       - name: "Patching kernel with apatch"
         if: ${{ env.withAPatch == 'true' }}
         run: |
@@ -219,7 +218,7 @@ jobs:
             ./apt/kptools \
               -p -i ./out_kernel/Image \
               -s "${{ secrets.APATCH_KEY }}" \
-              -M ./apt/crpkb.kpm -V pre-kernel-init -T kpm \
+              -M ./cherish_peekaboo_1.5.kpm -V pre-kernel-init -T kpm \
               -k ./apt/kpimg -o ./out_kernel/kernel
           else
             ./apt/kptools \
