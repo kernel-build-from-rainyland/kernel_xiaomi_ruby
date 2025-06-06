@@ -216,15 +216,15 @@ jobs:
         run: |
           if [ ${{ env.withCherish }} = true ]; then
             ./apt/kptools \
-              -p -i ./out_kernel/Image \
-              -s "${{ secrets.APATCH_KEY }}" \
-              -M ./cherish_peekaboo_1.5.kpm -V pre-kernel-init -T kpm \
-              -k ./apt/kpimg -o ./out_kernel/kernel
+              --patch --image ./out_kernel/Image \
+              -S "${{ secrets.APATCH_KEY }}" \
+              --kpimg ./apt/kpimg -o ./out_kernel/kernel \
+              -M ./cherish_peekaboo_1.5.kpm -V pre-kernel-init -T kpm
           else
             ./apt/kptools \
-              -p -i ./out_kernel/Image \
-              -s "${{ secrets.APATCH_KEY }}" \
-              -k ./apt/kpimg -o ./out_kernel/kernel
+              --patch --image ./out_kernel/Image \
+              -S "${{ secrets.APATCH_KEY }}" \
+              --kpimg ./apt/kpimg -o ./out_kernel/kernel
           fi
       - name: "Pack kernel image"
         run: | 
