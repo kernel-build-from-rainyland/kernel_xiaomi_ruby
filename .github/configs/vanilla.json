@@ -1,5 +1,6 @@
 [
   {
+    "name": "moonwake-vanilla",
     "kernelSource": {
       "name": "ruby",
       "repo": "https://github.com/RainyXeon/MoonWake",
