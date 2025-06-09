@@ -9,7 +9,7 @@
     },
     "apatch": {
       "enable": true,
-      "version": "0.11.1-dev",
+      "version": "0.11.2",
       "cherish": false
     },
     "toolchains": [
