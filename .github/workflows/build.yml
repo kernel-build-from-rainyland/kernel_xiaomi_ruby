@@ -41,6 +41,7 @@ jobs:
       WORKSPACE: ${{ github.workspace }}
 
       builddate: "${{ needs.Set-repos.outputs.builddate }}"
+      fileName: ${{ matrix.repos.name }}
 
       KERNEL_NAME: ${{ matrix.repos.kernelSource.name }}
       KERNEL_REPO: ${{ matrix.repos.kernelSource.repo }}
@@ -249,30 +250,9 @@ jobs:
           ../magiskboot_x86 repack og-apatch.img
           cd ..
 
-          if [ ${{ env.withAPatch }} = true ]; then
-            if [ ${{ env.withCherish }} = true ]; then
-              cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
-            else
-              cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img
-            fi
-          else
-            cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img
-          fi
-      - name: "Upload image (cherish apatch)"
+          cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img
+      - name: "Upload image"
         uses: actions/upload-artifact@v4
-        if: ${{ env.withAPatch == 'true' && env.withCherish == 'true'}}
         with:
-          name: "${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
-          path: "out_kernel/${{ env.KERNEL_DEVICE }}-cherish-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
-      - name: "Upload image (apatch)"
-        uses: actions/upload-artifact@v4
-        if: ${{ env.withAPatch == 'true' && env.withCherish != 'true' }}
-        with:
-          name: "${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
-          path: "out_kernel/${{ env.KERNEL_DEVICE }}-apatch-${{ env.APatchVersion }}-${{ env.builddate }}.img"
-      - name: "Upload image (vanilla)"
-        uses: actions/upload-artifact@v4
-        if: ${{ env.withAPatch != 'true' && env.withCherish != 'true' }}
-        with:
-          name: "${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}"
-          path: "out_kernel/${{ env.KERNEL_DEVICE }}-vanilla-${{ env.builddate }}.img"
+          name: "${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
+          path: "out_kernel/${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img"
