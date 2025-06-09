@@ -1,6 +1,6 @@
 [
   {
-    "name": "apatch",
+    "name": "moonwake-apatch",
     "kernelSource": {
       "name": "ruby",
       "repo": "https://github.com/RainyXeon/MoonWake",
