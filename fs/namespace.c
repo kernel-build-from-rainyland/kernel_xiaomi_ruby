@@ -188,8 +188,16 @@ static struct mount *alloc_vfsmnt(const char *name)
 			if (!mnt->mnt_devname)
 				goto out_free_id;
 		}
+#ifdef CONFIG_SMP
+		mnt->mnt_pcp = alloc_percpu(struct mnt_pcp);
+		if (!mnt->mnt_pcp)
+			goto out_free_devname;
+
+		this_cpu_add(mnt->mnt_pcp->mnt_count, 1);
+#else
 		mnt->mnt_count = 1;
 		mnt->mnt_writers = 0;
+#endif
 		mnt->mnt.data = NULL;
 
 		INIT_HLIST_NODE(&mnt->mnt_hash);
