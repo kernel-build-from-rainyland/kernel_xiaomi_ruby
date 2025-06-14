@@ -25,7 +25,7 @@ jobs:
           echo "EOF" >> $GITHUB_OUTPUT
       - name: "Set builddate"
         id: generate-builddate
-        run: echo "builddate=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
+        run: echo "builddate=$(date '+%Y%m%d-%H%M')" >> $GITHUB_OUTPUT
 
   Build-Kernel:
     name: "Build kernel"
