@@ -12,7 +12,7 @@
       "enable": true,
       "setupLink": "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh",
       "setupArg": "susfs-main",
-      "setupName": "SukiSU-Ultra",
+      "setupName": "KernelSU",
       "susfsLink": "https://github.com/RainyXeon/susfs4ksu/blob/sukisu-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
     },
     "toolchains": [
