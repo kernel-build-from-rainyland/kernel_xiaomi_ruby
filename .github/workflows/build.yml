@@ -191,7 +191,8 @@ jobs:
           KERNELSU_TYPE_ROOT_IMPL_VERSION=$(cd ${{ env.kernelSUsetupName }} && expr $(/usr/bin/git rev-list --count HEAD) + 10200)
           echo -e "\nKernelSU Type Root Implementation version: $KERNELSU_TYPE_ROOT_IMPL_VERSION\n"
           echo -e "KERNELSU_TYPE_ROOT_IMPL_VERSION=$KERNELSU_TYPE_ROOT_IMPL_VERSION" >> $GITHUB_OUTPUT
-          if [ ${{ env.needPatch }} = true ]; then
+
+          if [ ${{ env.kernelSUneedPatch }} = true ]; then
             cd ${{ env.kernelSUsetupName }}
             curl ${{ env.kernelSUsusfsLink }} -o susfs.patch
             patch -p1 < susfs.patch
