@@ -50,9 +50,11 @@ jobs:
 
       DEFCONFIG_NAME: ${{ matrix.repos.kernelSource.defconfig }}
 
-      withKernelSU: ${{ matrix.repos.kernelsu.enable }}
-      withKernelSUSetupLink: ${{ matrix.repos.kernelsu.setupLink }}
-      withKernelSUSetupArg: ${{ matrix.repos.kernelsu.setupArg }}
+      kernelSU: ${{ matrix.repos.kernelsu.enable }}
+      kernelSUsetupLink: ${{ matrix.repos.kernelsu.setupLink }}
+      kernelSUsetupArg: ${{ matrix.repos.kernelsu.setupArg }}
+      kernelSUsetupName: ${{ matrix.repos.kernelsu.setupName }}
+      kernelSUsusfsLink: ${{ matrix.repos.kernelsu.susfsLink }}
       ccache: ${{ matrix.repos.ccache }}
       useAnykernel: ${{ matrix.repos.AnyKernel3.use }}
       release: ${{ matrix.repos.AnyKernel3.release }}
@@ -181,15 +183,15 @@ jobs:
         working-directory: ${{ env.KERNEL_NAME }}
         env:
           arch: ${{ steps.generate-args.outputs.ARCH }}
-        if: ${{ env.withKernelSU == 'true' }}
+        if: ${{ env.kernelSU == 'true' }}
         run: |
           echo "" > .scmversion
-          curl -LSs "${{ env.withKernelSUSetupLink }}" | bash -s ${{ env.withKernelSUSetupArg }}
-          KERNELSU_TYPE_ROOT_IMPL_VERSION=$(cd KernelSU-Next && expr $(/usr/bin/git rev-list --count HEAD) + 10200)
-          echo -e "\nKernelSU Next Type Root Implementation version: $KERNELSU_TYPE_ROOT_IMPL_VERSION\n"
+          curl -LSs "${{ env.kernelSUsetupLink }}" | bash -s ${{ env.kernelSUsetupArg }}
+          KERNELSU_TYPE_ROOT_IMPL_VERSION=$(cd ${{ env.kernelSUsetupName }} && expr $(/usr/bin/git rev-list --count HEAD) + 10200)
+          echo -e "\nKernelSU Type Root Implementation version: $KERNELSU_TYPE_ROOT_IMPL_VERSION\n"
           echo -e "KERNELSU_TYPE_ROOT_IMPL_VERSION=$KERNELSU_TYPE_ROOT_IMPL_VERSION" >> $GITHUB_OUTPUT
-          cd KernelSU-Next
-          curl https://raw.githubusercontent.com/wodanesdag/susfs4ksu/refs/heads/next-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch -o susfs.patch
+          cd ${{ env.kernelSUsetupName }}
+          curl ${{ env.kernelSUsusfsLink }} -o susfs.patch
           patch -p1 < susfs.patch
           cd ../scripts
           sed -i 's/ -dirty//g' setlocalversion   
