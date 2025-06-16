@@ -189,7 +189,7 @@ jobs:
           echo -e "\nKernelSU Next Type Root Implementation version: $KERNELSU_TYPE_ROOT_IMPL_VERSION\n"
           echo -e "KERNELSU_TYPE_ROOT_IMPL_VERSION=$KERNELSU_TYPE_ROOT_IMPL_VERSION" >> $GITHUB_OUTPUT
           cd KernelSU-Next
-          curl https://gitlab.com/simonpunk/susfs4ksu/-/raw/kernel-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch -o susfs.patch
+          curl https://raw.githubusercontent.com/wodanesdag/susfs4ksu/refs/heads/next-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch -o susfs.patch
           patch -p1 < susfs.patch
           cd ../scripts
           sed -i 's/ -dirty//g' setlocalversion   
