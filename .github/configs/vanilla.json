@@ -8,8 +8,10 @@
       "device": "ruby",
       "defconfig": "ruby_defconfig"
     },
-    "withKernelSU": false,
-    "withSuSFS": false,
+    "kernelsu": {
+      "enable": false,
+      "setupLink": "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh"
+    },
     "toolchains": [
       {
         "url": "https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86/+archive/refs/heads/main/clang-r547379.tar.gz",
