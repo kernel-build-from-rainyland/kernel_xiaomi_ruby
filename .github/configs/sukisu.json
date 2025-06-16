@@ -11,10 +11,10 @@
     "kernelsu": {
       "enable": true,
       "setupLink": "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh",
-      "setupArg": "nongki",
+      "setupArg": "susfs-main",
       "setupName": "KernelSU",
-      "needPatch": true,
-      "susfsLink": "https://github.com/RainyXeon/susfs4ksu/blob/sukisu-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+      "needPatch": false,
+      "susfsLink": ""
     },
     "toolchains": [
       {
