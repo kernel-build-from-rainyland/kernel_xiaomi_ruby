@@ -11,7 +11,8 @@
     "kernelsu": {
       "enable": true,
       "setupLink": "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh",
-      "setupArg": "susfs-main"
+      "setupArg": "susfs-main",
+      "setupName": "SukiSU-Ultra"
     },
     "toolchains": [
       {
