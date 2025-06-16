@@ -10,10 +10,11 @@
     },
     "kernelsu": {
       "enable": false,
-      "setupLink": "https://raw.githubusercontent.com/KernelSU-Next/KernelSU-Next/next/kernel/setup.sh",
-      "setupArg": "next",
-      "setupName": "KernelSU-Next",
-      "susfsLink": "https://raw.githubusercontent.com/RainyXeon/susfs4ksu/refs/heads/next-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
+      "setupLink": "",
+      "setupArg": "",
+      "setupName": "",
+      "needPatch": false,
+      "susfsLink": ""
     },
     "toolchains": [
       {
