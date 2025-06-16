@@ -13,8 +13,8 @@
       "setupLink": "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh",
       "setupArg": "susfs-test",
       "setupName": "KernelSU",
-      "needPatch": false,
-      "susfsLink": ""
+      "needPatch": true,
+      "susfsLink": "https://raw.githubusercontent.com/wodanesdag/susfs4ksu/refs/heads/next-4.19/kernel_patches/KernelSU/10_enable_susfs_for_ksu.patch"
     },
     "toolchains": [
       {
