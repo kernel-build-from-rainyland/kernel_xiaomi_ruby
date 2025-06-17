@@ -42,6 +42,7 @@ jobs:
 
       builddate: "${{ needs.Set-repos.outputs.builddate }}"
       fileName: ${{ matrix.repos.name }}
+      ogImageLink: ${{ matrix.repos.ogImageLink }}
 
       KERNEL_NAME: ${{ matrix.repos.kernelSource.name }}
       KERNEL_REPO: ${{ matrix.repos.kernelSource.repo }}
@@ -94,6 +95,15 @@ jobs:
           key: ccache-${{ env.KERNEL_NAME }}-${{ steps.ccache_key.outputs.CACHE_KEY }}-${{ env.builddate }}
           restore-keys: |
             ccache-${{ env.KERNEL_NAME }}-${{ steps.ccache_key.outputs.CACHE_KEY }}-${{ env.builddate }}
+      - name: "Setup Anykernel3"
+        if: ${{ env.useAnykernel == 'true' }}
+        env:
+          params: "${{ toJSON(matrix.repos.AnyKernel3) }}"
+        run: |
+          ANYKERNEL_REPO=$(echo $params | jq -r ".repo")
+          ANYKERNEL_BRANCH=$(echo $params | jq -r ".branch")
+          git clone --recursive --depth=1 -j $(nproc) --branch $ANYKERNEL_BRANCH $ANYKERNEL_REPO AnyKernel3
+          echo "Setup Anykernel3 => ($ANYKERNEL_REPO)"
       - name: "Clone kernel source => (${{ env.KERNEL_REPO }})"
         run: |
           git clone --recursive --depth=1 -j $(nproc) --branch $KERNEL_BRANCH $KERNEL_REPO $KERNEL_NAME
@@ -179,7 +189,7 @@ jobs:
           echo "$args"
           echo "ARCH=$ARCH" >> $GITHUB_OUTPUT
           echo "args=$args" >> $GITHUB_OUTPUT
-      - name: "Integrate KernelSU Next"
+      - name: "Integrate Kernel Root implementation"
         id: integrate-kernelsu-next
         working-directory: ${{ env.KERNEL_NAME }}
         env:
@@ -217,32 +227,57 @@ jobs:
         run: |
           echo "PATH Variable: $PATH"
           make ${{ env.args }}
+      - name: "Pack AnyKernel3.zip"
+        if: ${{ env.useAnykernel == 'true' }}
+        env:
+          arch: ${{ steps.generate-args.outputs.ARCH }}
+        run: |
+          ls -al
+          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz" ]; then
+            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image.gz ./AnyKernel3/
+          fi
+          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo" ]; then
+            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo ./AnyKernel3/
+          fi
+          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo.img" ]; then
+            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtbo.img ./AnyKernel3/
+          fi
+          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtb.img" ]; then
+            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtb.img ./AnyKernel3/
+          fi
+          if [ -e "${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtb" ]; then
+            cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/dtb ./AnyKernel3/
+          fi
+          cd AnyKernel3/
+      - name: "Upload AnyKernel3 image"
+        uses: actions/upload-artifact@v4
+        if: ${{ env.useAnykernel == 'true' }}
+        with:
+          name: "${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
+          path: AnyKernel3/*
       - name: "Push to out_kernel folder and download ramdisk"
+        if: ${{ env.useAnykernel != 'true' }}
         env:
           arch: ${{ steps.generate-args.outputs.ARCH }}
         run: |
           mkdir out_kernel
           cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image ./out_kernel/
       - name: "Pack kernel image"
+        if: ${{ env.useAnykernel != 'true' }}
         run: | 
           curl -L -O https://github.com/Shubhamvis98/AIK/raw/4ac321dfd48e16344e6146c505708aa720ff0bb3/bin/magiskboot_x86
-          
           chmod +x ./magiskboot_x86
-          
           mkdir wrap_kernel
           cd wrap_kernel
-          
-          curl -L -O https://github.com/RainyXeon/MoonWake/releases/download/cloud/og-apatch.img
-          
+          curl -L -O ${{ env.ogImageLink }}
           ../magiskboot_x86 unpack og-apatch.img
           rm -rf ./kernel
           mv ../out_kernel/Image ./kernel
           ../magiskboot_x86 repack og-apatch.img
-          
           cd ..
-
           cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img
       - name: "Upload image"
+        if: ${{ env.useAnykernel != 'true' }}
         uses: actions/upload-artifact@v4
         with:
           name: "${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
