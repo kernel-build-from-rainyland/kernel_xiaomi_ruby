@@ -48,5 +48,15 @@
         "LLVM_DIS": "clang-AOSP/bin/llvm-dis"
       }
     }
+  },
+  "Image": {
+    "use": true,
+    "url": "https://github.com/RainyXeon/MoonWake/releases/download/cloud/og-apatch.img"
+  },
+  "AnyKernel3": {
+    "use": true,
+    "release": true,
+    "repo": "https://github.com/wodanesdag/AnyKernel3/",
+    "branch": "ruby"
   }
 ]
