@@ -42,7 +42,7 @@ jobs:
 
       builddate: "${{ needs.Set-repos.outputs.builddate }}"
       fileName: ${{ matrix.repos.name }}
-      ogImageLink: ${{ matrix.repos.ogImageLink }}
+      ogImageLink: ${{ matrix.repos.Image.url }}
 
       KERNEL_NAME: ${{ matrix.repos.kernelSource.name }}
       KERNEL_REPO: ${{ matrix.repos.kernelSource.repo }}
@@ -59,6 +59,7 @@ jobs:
       kernelSUneedPatch: ${{ matrix.repos.kernelsu.needPatch }}
       ccache: ${{ matrix.repos.ccache }}
       useAnykernel: ${{ matrix.repos.AnyKernel3.use }}
+      useImage: ${{ matrix.repos.Image.use }}
       release: ${{ matrix.repos.AnyKernel3.release }}
     steps:
       - name: "Install prerequisites"
@@ -253,17 +254,17 @@ jobs:
         uses: actions/upload-artifact@v4
         if: ${{ env.useAnykernel == 'true' }}
         with:
-          name: "${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
+          name: "anykernel-${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
           path: AnyKernel3/*
       - name: "Push to out_kernel folder and download ramdisk"
-        if: ${{ env.useAnykernel != 'true' }}
+        if: ${{ env.useImage == 'true' }}
         env:
           arch: ${{ steps.generate-args.outputs.ARCH }}
         run: |
           mkdir out_kernel
           cp -f ${{ env.OUT_DIR }}/arch/${{ env.arch }}/boot/Image ./out_kernel/
       - name: "Pack kernel image"
-        if: ${{ env.useAnykernel != 'true' }}
+        if: ${{ env.useImage == 'true' }}
         run: | 
           curl -L -O https://github.com/Shubhamvis98/AIK/raw/4ac321dfd48e16344e6146c505708aa720ff0bb3/bin/magiskboot_x86
           chmod +x ./magiskboot_x86
@@ -275,10 +276,10 @@ jobs:
           mv ../out_kernel/Image ./kernel
           ../magiskboot_x86 repack og-apatch.img
           cd ..
-          cp -f ./wrap_kernel/new-boot.img ./out_kernel/${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img
+          cp -f ./wrap_kernel/new-boot.img ./out_kernel/image-${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img
       - name: "Upload image"
-        if: ${{ env.useAnykernel != 'true' }}
+        if: ${{ env.useImage == 'true' }}
         uses: actions/upload-artifact@v4
         with:
-          name: "${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
-          path: "out_kernel/${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img"
+          name: "image-${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}"
+          path: "out_kernel/image-${{ env.fileName }}-${{ env.KERNEL_DEVICE }}-${{ env.builddate }}.img"
