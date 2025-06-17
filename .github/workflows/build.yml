@@ -42,7 +42,7 @@ jobs:
 
       builddate: "${{ needs.Set-repos.outputs.builddate }}"
       fileName: ${{ matrix.repos.name }}
-      ogImageLink: ${{ matrix.repos.Image.url }}
+      ogImageLink: ${{ matrix.repos.image.imageurl }}
 
       KERNEL_NAME: ${{ matrix.repos.kernelSource.name }}
       KERNEL_REPO: ${{ matrix.repos.kernelSource.repo }}
@@ -59,7 +59,7 @@ jobs:
       kernelSUneedPatch: ${{ matrix.repos.kernelsu.needPatch }}
       ccache: ${{ matrix.repos.ccache }}
       useAnykernel: ${{ matrix.repos.AnyKernel3.use }}
-      useImage: ${{ matrix.repos.Image.use }}
+      useImage: ${{ matrix.repos.image.use }}
       release: ${{ matrix.repos.AnyKernel3.release }}
     steps:
       - name: "Install prerequisites"
