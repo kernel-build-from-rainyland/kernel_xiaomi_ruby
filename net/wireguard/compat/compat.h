@@ -1140,6 +1140,7 @@ struct dst_cache_pcpu {
 	};
 };
 #define COMPAT_HAS_DEFINED_DST_CACHE_PCPU
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0)
 static inline void dst_cache_reset_now(struct dst_cache *dst_cache)
 {
 	int i;
@@ -1157,6 +1158,7 @@ static inline void dst_cache_reset_now(struct dst_cache *dst_cache)
 		dst_release(dst);
 	}
 }
+#endif
 #endif
 
 #if defined(ISUBUNTU1604) || defined(ISRHEL7)
