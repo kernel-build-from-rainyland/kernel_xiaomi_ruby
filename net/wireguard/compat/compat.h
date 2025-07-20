@@ -412,7 +412,7 @@ static inline u64 __compat_jiffies64_to_nsecs(u64 j)
 }
 #define jiffies64_to_nsecs __compat_jiffies64_to_nsecs
 #endif
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0)
 static inline u64 ktime_get_coarse_boottime_ns(void)
 {
 #if LINUX_VERSION_CODE < KERNEL_VERSION(3, 17, 0)
@@ -1086,7 +1086,7 @@ static inline void skb_reset_redirect(struct sk_buff *skb)
 #include <linux/skbuff.h>
 #include <linux/ip.h>
 #include <linux/ipv6.h>
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 19, 0)
 static inline __be16 ip_tunnel_parse_protocol(const struct sk_buff *skb)
 {
 	if (skb_network_header(skb) >= skb->head &&
